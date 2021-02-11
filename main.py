@@ -31,11 +31,17 @@ def find_global_alignment(a, path1, path2, i, j, count):
                 path2[count+k] = '-'
             else:
                 return
-        for k in range(count + j+1):
-            print(path1[count+j-k], end=" ")
+        for k in range(count + j):
+            print(path1[count+j-k-1], end=" ")
         print()
-        for k in range(count + j + 1):
-            print(path2[count+j-k], end=" ")
+        for k in range(count + j):
+            if(path1[count+j-k-1]==path2[count+j-k-1]):
+                print("|", end=" ")
+            else:
+                print(" ",end=" ")
+        print()
+        for k in range(count + j ):
+            print(path2[count+j-k-1], end=" ")
         print()
         print()
         return
@@ -80,6 +86,12 @@ def find_local_alignment(a, path1, path2, i, j, count):
             print(path1[count-k-1], end=" ")
         print()
         for k in range(count):
+            if(path1[count-k-1]==path2[count-k-1]):
+                print("|", end=" ")
+            else:
+                print(" ",end=" ")
+        print()
+        for k in range(count):
             print(path2[count-k-1], end=" ")
         print()
         print()
@@ -107,7 +119,7 @@ if __name__ == '__main__':
     seq2 = 'TTCAGTA'
     match = 2
     mismatch = -1
-    gap = -1
+    gap = -2
     n = len(seq2)
     m = len(seq1)
     g_matrix = numpy.zeros((n + 1, m + 1), dtype='int')
@@ -117,8 +129,8 @@ if __name__ == '__main__':
     print(g_matrix)
     print()
     print(l_matrix)
-    path1 = ['' for i in range(m + n)]
-    path2 = ['' for i in range(m + n)]
+    path1 = [0 for i in range(m + n)]
+    path2 = [0 for i in range(m + n)]
     cur_max=0
     for i in range (n+1):
         for j in range (m+1):
