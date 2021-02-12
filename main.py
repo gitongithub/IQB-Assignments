@@ -3,9 +3,10 @@ import numpy
 
 def global_alignment(a, gap):
     for i in range(1, n + 1):
-        a[i][0] = -i
+        a[i][0] = (i*gap)
     for i in range(1, m + 1):
-        a[0][i] = -i
+        a[0][i] = (i*gap)
+
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             if seq2[i - 1] == seq1[j - 1]:
@@ -150,12 +151,22 @@ if __name__ == '__main__':
     print()
     print("Dynamic Programming matrix for global alignment is:")
     print()
-    print(g_matrix)
+    print(end="          ")
+    print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
+    k = 0
+    for row in g_matrix:
+        if len(seq2) >= k > 0:
+            print(seq2[k - 1], end="  ")
+        k += 1
+        if k == 1:
+            print("   ", end="")
+        print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in row]))
     print()
     print("Following are the optimal alignment(s) with a best score of", g_matrix[n][m], ":")
     print()
     find_global_alignment(g_matrix, gap_pen, path1, path2, n, m, 0)
     cur_max = 0
+
     for i in range(n + 1):
         for j in range(m + 1):
             cur_max = max(cur_max, l_matrix[i][j])
@@ -163,7 +174,16 @@ if __name__ == '__main__':
     print()
     print("Dynamic Programming matrix for local alignment is:")
     print()
-    print(l_matrix)
+    print(end="         ")
+    print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
+    k=0
+    for row in l_matrix:
+        if len(seq2) >= k > 0:
+            print(seq2[k - 1], end="  ")
+        k += 1
+        if k == 1:
+            print("   ", end="")
+        print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in row]))
     print()
     print("Following are the optimal alignment(s) with a best score of", cur_max, ":")
     print()
@@ -178,7 +198,16 @@ if __name__ == '__main__':
     print()
     print("Dynamic Programming matrix for global alignment is:")
     print()
-    print(g_matrix)
+    print(end="          ")
+    print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
+    k=0
+    for row in g_matrix:
+        if len(seq2) >= k > 0:
+            print(seq2[k - 1], end="  ")
+        k += 1
+        if k == 1:
+            print("   ", end="")
+        print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in row]))
     print()
     print("Following are the optimal alignment(s) with a best score of", g_matrix[n][m], ":")
     print()
@@ -189,7 +218,16 @@ if __name__ == '__main__':
             cur_max = max(cur_max, l_matrix[i][j])
     print("Dynamic Programming matrix for local alignment is:")
     print()
-    print(l_matrix)
+    print(end="         ")
+    print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
+    k=0
+    for row in l_matrix:
+        if len(seq2) >= k > 0:
+            print(seq2[k - 1], end="  ")
+        k += 1
+        if k == 1:
+            print("   ", end="")
+        print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in row]))
     print()
     print("Following are the optimal alignment(s) with a best score of", cur_max, ":")
     print()
@@ -197,4 +235,3 @@ if __name__ == '__main__':
         for j in range(m + 1):
             if l_matrix[i][j] == cur_max:
                 find_local_alignment(l_matrix, gap_pen, path1, path2, i, j, 0)
-
