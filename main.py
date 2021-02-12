@@ -2,11 +2,13 @@ import numpy
 
 
 def global_alignment(a, gap):
+    # initializing the 0th row and column with gap penalties
     for i in range(1, n + 1):
-        a[i][0] = (i*gap)
+        a[i][0] = (i * gap)
     for i in range(1, m + 1):
-        a[0][i] = (i*gap)
-
+        a[0][i] = (i * gap)
+    # for all the rest of the cells checking if match/mismatch and then computing the best score
+    # after considering match/mismatch or gap in either of the sequences
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             if seq2[i - 1] == seq1[j - 1]:
@@ -16,6 +18,14 @@ def global_alignment(a, gap):
 
 
 def local_alignment(a, gap):
+    # initializing the 0th row and column with 0
+    for i in range(1, n + 1):
+        a[i][0] = 0
+    for i in range(1, m + 1):
+        a[0][i] = 0
+    # for all the rest of the cells checking if match/mismatch and then computing the best score
+    # after considering match/mismatch or gap in either of the sequences
+    # However, no cell is assigned the value of less than 0
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             if seq2[i - 1] == seq1[j - 1]:
@@ -25,13 +35,29 @@ def local_alignment(a, gap):
 
 
 def find_global_alignment(a, gap, path1, path2, i, j, count):
-    if i == 0:
-        for k in range(1, j + 1):
-            if a[0][j - k] == a[0][j - k - 1]:
-                path1[count + k] = seq1[j - k - 1]
-                path2[count + k] = '-'
+    # if the last step was due to a match/mismatch we will directly reach the top left cell and so
+    #we can print our path
+    if i==0 and j==0:
+        for k in range(count):
+            print(path1[count - k - 1], end=" ")
+        print()
+        for k in range(count):
+            if path1[count - k - 1] == path2[count- k - 1]:
+                print("|", end=" ")
             else:
-                return
+                print(" ", end=" ")
+        print()
+        for k in range(count):
+            print(path2[count - k - 1], end=" ")
+        print()
+        print()
+        return
+    if i == 0:
+        path1[count ] = seq1[j - 1]
+        path2[count ] = '-'
+        for k in range(1, j ):
+            path1[count + k ] = seq1[j - k - 1]
+            path2[count + k ] = '-'
         for k in range(count + j):
             print(path1[count + j - k - 1], end=" ")
         print()
@@ -47,23 +73,29 @@ def find_global_alignment(a, gap, path1, path2, i, j, count):
         print()
         return
     if j == 0:
-        for k in range(1, i):
-            if a[i - k][0] == a[i - k - 1][0]:
-                path1[count + k] = '-'
-                path2[count + k] = seq2[i - k - 1]
-            else:
-                return
+        path1[count ] = '-'
+        path2[count ] = seq2[i - 1]
+        for k in range(1, i + 1):
+            path1[count + k ] = '-'
+            path2[count + k ] = seq2[i - k - 1]
 
         for k in range(count + i):
-            print(path1[count + i - k], end=" ")
+            print(path1[count +i-k -1], end=" ")
         print()
         for k in range(count + i):
-            print(path2[count + i - k], end=" ")
+            if path1[count + i - k - 1] == path2[count +i -k - 1]:
+                print("|", end=" ")
+            else:
+                print(" ", end=" ")
+        print()
+        for k in range(count + i):
+            print(path2[count +i -k -1], end=" ")
         print()
         print()
         return
-
-    path1[count] = a[i][j]
+    # checking for a match/mismatch and then doing a recursive call after making valid jump to
+    # left, up, diagonally up any(>0) which gives valid solution
+    # before recursive call, store the alignment step in the path
     if i - 1 >= 0 and j - 1 >= 0 and seq2[i - 1] == seq1[j - 1] and a[i - 1][j - 1] + match == a[i][j]:
         path1[count] = seq1[j - 1]
         path2[count] = seq2[i - 1]
@@ -83,6 +115,9 @@ def find_global_alignment(a, gap, path1, path2, i, j, count):
 
 
 def find_local_alignment(a, gap, path1, path2, i, j, count):
+    # when a 0 valued cell is reached that gives us an optimal path, however we still continue our
+    # backtracking algorithm to check if there is a valid move from this 0 and if there is, it will
+    # give us more paths
     if a[i][j] == 0:
         for k in range(count):
             print(path1[count - k - 1], end=" ")
@@ -114,7 +149,9 @@ def find_local_alignment(a, gap, path1, path2, i, j, count):
             path2[count] = '-'
             find_local_alignment(a, gap, path1, path2, i, j - 1, count + 1)
         return
-    path1[count] = a[i][j]
+    # checking for a match/mismatch and then doing a recursive call after making valid jump to
+    # left, up, diagonally up any(>0) which gives valid solution
+    # before recursive call, store the alignment step in the path
     if i - 1 >= 0 and j - 1 >= 0 and seq2[i - 1] == seq1[j - 1] and a[i - 1][j - 1] + match == a[i][j]:
         path1[count] = seq1[j - 1]
         path2[count] = seq2[i - 1]
@@ -134,6 +171,7 @@ def find_local_alignment(a, gap, path1, path2, i, j, count):
 
 
 if __name__ == '__main__':
+    # defining sequences, their lengths and the scoring scheme
     seq1 = 'ATCAGAGTA'
     seq2 = 'TTCAGTA'
     match = 2
@@ -141,11 +179,13 @@ if __name__ == '__main__':
     gap_pen = -1
     n = len(seq2)
     m = len(seq1)
+    # initializing storage variables
     path1 = [0 for i in range(m + n)]
     path2 = [0 for i in range(m + n)]
     g_matrix = numpy.zeros((n + 1, m + 1), dtype='int')
-    global_alignment(g_matrix, gap_pen)
     l_matrix = numpy.zeros((n + 1, m + 1), dtype='int')
+    # function calls for creation of the matrices for q1 and q2
+    global_alignment(g_matrix, gap_pen)
     local_alignment(l_matrix, gap_pen)
     print("Question 1:")
     print()
@@ -154,6 +194,7 @@ if __name__ == '__main__':
     print(end="          ")
     print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
     k = 0
+    # printing the formatted global alignment matrix
     for row in g_matrix:
         if len(seq2) >= k > 0:
             print(seq2[k - 1], end="  ")
@@ -164,6 +205,7 @@ if __name__ == '__main__':
     print()
     print("Following are the optimal alignment(s) with a best score of", g_matrix[n][m], ":")
     print()
+    # function call for getting optimal solutions
     find_global_alignment(g_matrix, gap_pen, path1, path2, n, m, 0)
     cur_max = 0
 
@@ -176,7 +218,8 @@ if __name__ == '__main__':
     print()
     print(end="         ")
     print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
-    k=0
+    k = 0
+    # printing the formatted local alignment matrix
     for row in l_matrix:
         if len(seq2) >= k > 0:
             print(seq2[k - 1], end="  ")
@@ -187,11 +230,14 @@ if __name__ == '__main__':
     print()
     print("Following are the optimal alignment(s) with a best score of", cur_max, ":")
     print()
+    # function call(s) for getting optimal solutions
     for i in range(n + 1):
         for j in range(m + 1):
             if l_matrix[i][j] == cur_max:
                 find_local_alignment(l_matrix, gap_pen, path1, path2, i, j, 0)
+    # updating value of gap penalty for q4
     gap_pen = -2
+    # function calls for creation of the matrices for q4
     global_alignment(g_matrix, gap_pen)
     local_alignment(l_matrix, gap_pen)
     print("Question 4:")
@@ -200,7 +246,8 @@ if __name__ == '__main__':
     print()
     print(end="          ")
     print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
-    k=0
+    k = 0
+    # printing the formatted global alignment matrix
     for row in g_matrix:
         if len(seq2) >= k > 0:
             print(seq2[k - 1], end="  ")
@@ -211,6 +258,7 @@ if __name__ == '__main__':
     print()
     print("Following are the optimal alignment(s) with a best score of", g_matrix[n][m], ":")
     print()
+    # function call for getting optimal solutions
     find_global_alignment(g_matrix, gap_pen, path1, path2, n, m, 0)
     cur_max = 0
     for i in range(n + 1):
@@ -220,7 +268,8 @@ if __name__ == '__main__':
     print()
     print(end="         ")
     print(" ".join(["{:<{mx}}".format(ele, mx=5) for ele in seq1]))
-    k=0
+    k = 0
+    # printing the formatted local alignment matrix
     for row in l_matrix:
         if len(seq2) >= k > 0:
             print(seq2[k - 1], end="  ")
@@ -231,6 +280,7 @@ if __name__ == '__main__':
     print()
     print("Following are the optimal alignment(s) with a best score of", cur_max, ":")
     print()
+    # function call(s) for getting optimal solutions
     for i in range(n + 1):
         for j in range(m + 1):
             if l_matrix[i][j] == cur_max:
